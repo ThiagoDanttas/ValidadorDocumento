@@ -4,62 +4,89 @@
 from validate_docbr import CPF, CNPJ, CNH
 
 
-class Validador_documento:
+class Documento:
 
-    def __init__(self, documento, tipo_documento):
-        documento = str(documento)
-        self.tipo_documento = tipo_documento
+    @staticmethod
+    def cria_documento(documento, tipo_documento):
+        if tipo_documento == 'cpf':
+            return DocCpf(documento)
 
-        if self.tipo_documento == 'cpf':
-            if self.valida_cpf(documento):
-                self.cpf = documento
-        elif self.tipo_documento == 'cnh':
-            if self.valida_cnh(documento):
-                self.cnh = documento
-        elif self.tipo_documento == 'cnpj':
-            if self.valida_cnpj(documento):
-                self.cnpj = documento
+        elif tipo_documento == 'cnpj':
+            return DocCnpj(documento)
+        elif tipo_documento == 'cnh':
+            return DocCnh(documento)
         else:
-            raise ValueError('Documento inválido')
+            raise ValueError('Quantidade de digitos inválida!')
+
+
+class DocCpf:
+
+    def __init__(self, documento):
+        if self.valida_doc(documento):
+            self.cpf = documento
+        else:
+            raise ValueError('Cpf Inválido')
+
+    # imprime o número do cpf formatado
+    def __str__(self):
+        return self.format_cpf()
+
+    # Validação do CPF
+    def valida_doc(self, documento):
+        doc_cpf = CPF()
+        return doc_cpf.validate(documento)
+
+    # formatação do cpf
+    def format_cpf(self):
+        doc_cpf = CPF()
+        return doc_cpf.mask(self.cpf)
+
+
+class DocCnpj:
+
+    def __init__(self, documento):
+
+        if self.valida_doc(documento):
+            self.cnpj = documento
+        else:
+            raise ValueError('Cnpj inválido')
 
     def __str__(self):
-        return self.documento_format()
+        return self.format_cnpj()
 
-    def documento_format(self):
-        if self.tipo_documento == 'cpf':
-            doc_cpf = CPF()
-            return doc_cpf.mask(self.cpf)
-        elif self.tipo_documento == 'cnh':
-            doc_cnh = CNH()
-            return doc_cnh.mask(self.cnh)
-        else:
-            doc_cnpj = CNPJ()
-            return doc_cnpj.mask(self.cnpj)
+    # Validação do CNPJ
+    def valida_doc(self, documento):
+        doc_cnpj = CNPJ()
+        return doc_cnpj.validate(documento)
 
-    # valida o documento cpf
-    def valida_cpf(self, documento):
-        val_cpf = CPF()
-        if len(documento) == 11:
-            return val_cpf.validate(documento)
-        else:
-            raise ValueError('Número inválido')
+    # Retorna o CNPJ formatado
+    def format_cnpj(self):
+        doc_cnpj = CNPJ()
+        return doc_cnpj.mask(self.cnpj)
 
-    # valida o documento cnh
-    def valida_cnh(self, documento):
-        val_cnh = CNH()
-        if len(documento) == 11:
-            return val_cnh.validate(documento)
-        else:
-            raise ValueError('Número Inválido')
 
-    # valida o documento cnpj
-    def valida_cnpj(self, documento):
-        val_cnpj = CNPJ()
-        if len(documento) == 14:
-            return val_cnpj.validate(documento)
+class DocCnh:
+
+    def __init__(self, documento):
+        if self.valida_doc(documento):
+            self.cnh = documento
         else:
             raise ValueError('Número inválido')
 
+    def __str__(self):
+        return self.format_cnh()
 
-objeto = Validador_documento(43552446000131, 'cnpj')
+    # Validação da CNH
+    def valida_doc(self, documento):
+        doc_cnh = CNH()
+        return doc_cnh.validate(documento)
+
+    # Retorna a CNH formatada
+    def format_cnh(self):
+        doc_cnh = CNH()
+        return doc_cnh.mask(self.cnh)
+
+
+
+objeto = Documento.cria_documento('96878921916', 'cnh')
 print(objeto)
